@@ -1,0 +1,22 @@
+#extend("index"):
+  #export("body"):
+    <section class="container">
+      <h2>Blog</h2>
+      <div class="d-flex flex-row flex-wrap">
+        #for(post in posts):
+        <article class="w-50 p-1">
+          <a href="/#(post.slug)/">
+            <img class="img-fluid w-100" src="#(post.image)" alt="#(post.title)">
+            <h3>#(post.title)</h3>
+            <p>#(post.excerpt)</p>
+            <p class="category">
+              #date(post.date, "MM.dd.yyyy") &middot; #(post.category)
+            </p>
+          </a>
+        </article>
+        #endfor
+
+      </div>
+    </section>
+  #endexport
+#endextend
