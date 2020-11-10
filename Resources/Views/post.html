@@ -4,7 +4,7 @@
             <img class="img-fluid" src="#(post.image)" alt="#(post.title)" />
             <h2>#(post.title)</h2>
             <p>#(post.excerpt)</p>
-            <p class="category">#date(post.date, "MM.dd.yyyy") &middot; #(post.category)</p>
+            <p class="category">#date(post.date, "MM.dd.yyyy") &middot; #(post.category.title)</p>
             <hr>
             <p>#(post.content)</p>
         </article>
