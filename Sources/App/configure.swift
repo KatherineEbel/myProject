@@ -15,15 +15,25 @@ public func configure(_ app: Application) throws {
     database: Environment.get("DATABASE_NAME") ?? "vapor_blog_dev"
   ), as: .psql)
   let detected = app.leaf.configuration.rootDirectory
-  app.leaf.sources = .singleSource(NIOLeafFiles(fileio: app.fileio, limits: .default, sandboxDirectory: detected, viewDirectory: detected, defaultExtension: "html"))
+  let defaultSource = NIOLeafFiles(fileio: app.fileio, limits: .default, sandboxDirectory: detected, viewDirectory: detected, defaultExtension: "html")
+  let modulesSource = ModuleViewsLeafSource(rootDirectory: app.directory.workingDirectory,
+    modulesLocation: "Sources/App/Modules", viewsFolderName: "Views",
+    fileExtension: "html", fileIO: app.fileio)
+  let leafSources = LeafSources()
+  try leafSources.register(using: defaultSource)
+  try leafSources.register(source: "modules", using: modulesSource)
+  app.leaf.sources = leafSources
+  app.views.use(.leaf)
+
+  app.passwords.use(.bcrypt)
+
 
   if !app.environment.isRelease {
     app.leaf.cache.isEnabled = false
   }
   
-  app.views.use(.leaf)
-
   let modules: [Module] = [
+    UserModule(),
     FrontendModule(),
     BlogModule(),
   ]

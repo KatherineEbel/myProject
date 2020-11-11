@@ -16,7 +16,7 @@ struct BlogFrontendController {
       .with(\.$category)
       .all()
       .flatMap { posts in
-        req.view.render("blog", BlogViewContext(title: "myPage - Blog", posts: posts))
+        req.view.render("Blog/Frontend/Blog", BlogViewContext(title: "myPage - Blog", posts: posts))
       }
   }
 
@@ -31,7 +31,7 @@ struct BlogFrontendController {
           return req.eventLoop.future(req.redirect(to: "/"))
       }
       return req.view
-        .render("post", PostViewContext(title: post.title, post: post))
+        .render("Blog/Frontend/Post", PostViewContext(title: post.title, post: post))
         .encodeResponse(for: req)
     }
   }

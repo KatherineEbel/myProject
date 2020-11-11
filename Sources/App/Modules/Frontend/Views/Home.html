@@ -1,0 +1,18 @@
+#extend("Frontend/Index"):
+  #export("body"):
+    <section class="section">
+      <h2>#(header)</h2>
+    </section>
+    <section class="section">
+      <p>#(message)</p>
+    </section>
+    <section>
+      #if(isLoggedIn):
+        <b>#(email)</b> is logged in <a class="btn btn-link" href="/logout">Logout</a>
+      #else:
+      <a href="/sign-in" class="btn btn-link">Sign-In</a>
+      #endif
+    </section>
+  #endexport
+#endextend
+

@@ -24,6 +24,12 @@ let package = Package(
               .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
               .product(name: "LoremSwiftum", package: "LoremSwiftum"),
             ],
+          exclude: [
+            //"*.html", "*.leaf",
+            "Modules/Blog/Views",
+            "Modules/Frontend/Views",
+            "Modules/User/Views",
+          ],
             swiftSettings: [
                 .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release))
             ]
@@ -32,6 +38,6 @@ let package = Package(
         .testTarget(name: "AppTests", dependencies: [
             .target(name: "App"),
             .product(name: "XCTVapor", package: "vapor"),
-        ])
+        ]),
     ]
 )
