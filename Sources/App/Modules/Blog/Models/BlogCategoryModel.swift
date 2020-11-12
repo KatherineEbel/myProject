@@ -23,3 +23,10 @@ final class BlogCategoryModel: Model {
     self.title = title
   }
 }
+
+extension BlogCategoryModel: FormFieldStringOptionRepresentable {
+  var formFieldStringOption: FormFieldStringOption {
+    .init(key: id!.uuidString, label: title)
+  }
+
+}

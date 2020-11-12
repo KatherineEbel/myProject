@@ -52,6 +52,17 @@
                 #endif
             </div>
             <div class="mb-3">
+                <label for="categoryId" class="form-label">Category</label>
+                <select name="categoryId" id="categoryId" class="form-control">
+                    #for(option in categories):
+                        <option #if(option.key == edit.categoryId): selected="selected" #endif
+                                value="#(option.key)">
+                            #(option.label)
+                        </option>
+                    #endfor
+                </select>
+            </div>
+            <div class="mb-3">
                 <label for="date" class="form-label">Date</label>
                 <input type="date" class="form-control" id="date" value="#(edit.date)"
                        name="date" aria-describedby="dateHelp">

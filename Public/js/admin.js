@@ -10,4 +10,8 @@ $('.modal-trigger').click(function() {
     })
 })
 
+$(function () {
+    $('#categoryId').select2()
+})
+
 

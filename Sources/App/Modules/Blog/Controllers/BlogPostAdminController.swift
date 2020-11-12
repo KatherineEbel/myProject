@@ -8,7 +8,8 @@ import Leaf
 
 struct BlogPostAdminController {
   func listView(_ req: Request) throws -> EventLoopFuture<View> {
-    BlogPostModel.query(on: req.db).all().flatMap {
+    BlogPostModel.query(on: req.db).all()
+      .flatMap {
       req.view.render("Blog/Admin/Posts/List", ListViewContext(title: "Blog Admin", list: $0))
     }
   }
@@ -22,7 +23,12 @@ struct BlogPostAdminController {
       }
       .flatMap { form in
         let error = req.session.data["postError"]
-        return req.view.render("Blog/Admin/Posts/Edit", CreateViewContext(title: "Blog Admin", edit: form, editMode: "Create", errors: error))
+        return BlogCategoryModel.query(on: req.db)
+          .all()
+          .flatMap { categories in
+            let options = categories.map { category in FormFieldStringOption.fromModel(category)}
+            return req.view.render("Blog/Admin/Posts/Edit", CreateViewContext(title: "Blog Admin", edit: form, editMode: "Create", errors: error, categories: options))
+        }
       }
   }
 
@@ -33,6 +39,7 @@ struct BlogPostAdminController {
     } catch {
       if let error = error as? ValidationsError {
         req.session.data["postError"] = error.description
+        return req.eventLoop.future(req.redirect(to: "/admin/blog/posts"))
       }
       print(error.localizedDescription)
     }
@@ -61,10 +68,11 @@ struct BlogPostAdminController {
     let list: [BlogPostModel]
   }
 
-  struct CreateViewContext: Encodable {
+  struct CreateViewContext: Content {
     let title: String
     let edit: BlogPostEditForm
     let editMode: String
     let errors: String?
+    let categories: [FormFieldStringOption]
   }
 }

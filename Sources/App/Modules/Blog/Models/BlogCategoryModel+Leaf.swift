@@ -12,3 +12,4 @@ extension BlogCategoryModel: LeafDataRepresentable {
     ])
   }
 }
+

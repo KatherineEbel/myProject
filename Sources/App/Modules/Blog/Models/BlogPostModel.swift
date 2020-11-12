@@ -51,15 +51,19 @@ final class BlogPostModel: Model {
       let context = try request.content.decode(BlogPostEditForm.self)
       let uuid: UUID? = context.id != nil ? UUID(context.id!) : nil
       return BlogPostModel.find(uuid, on: request.db).flatMap { blogPost in
-        BlogCategoryModel.query(on: request.db).first()
-          .unwrap(or: Abort(.notFound))
+        let uuid = UUID(uuidString: context.categoryId)
+        return BlogCategoryModel.find(uuid, on: request.db)
+          .unwrap(or: Abort(.badRequest))
           .map { category in
             category.id
           }
           .unwrap(or: Abort(.internalServerError))
           .flatMap { id in
-            if let updatedBlogpost = context.write(to: blogPost, with: id) {
-              return updatedBlogpost.save(on: request.db).map { updatedBlogpost }
+            context.write(to: blogPost, with: id, for: request)
+          }
+          .flatMap { model in
+            if let model = model {
+              return model.save(on: request.db).map { model }
             } else {
               return request.eventLoop.future(nil)
             }
@@ -67,24 +71,3 @@ final class BlogPostModel: Model {
       }
   }
 }
-//if let error = error as? DecodingError {
-//  switch error {
-//  case .typeMismatch(let key, let value):
-//    print("TYPE MISMATCH")
-//    print("error '\(key)', value '\(value)' and ERROR: '\(error.localizedDescription)'")
-//  case .valueNotFound(let key, let value):
-//    print("VALUE NOT FOUND")
-//    print("error '\(key)', value '\(value)' and ERROR: '\(error.localizedDescription)'")
-//  case .keyNotFound(let key, let value):
-//    print("KEY NOT FOUND")
-//    print("error '\(key)', value '\(value)' and ERROR: '\(error.localizedDescription)'")
-//  case .dataCorrupted(let key):
-//    print("DATA CORRUPTED")
-//    print("error '\(key)', and ERROR: '\(error.localizedDescription)'")
-//  default:
-//    print("ERROR: '\(error.localizedDescription)'")
-//  }
-//} else {
-//  print("ERROR: ", error.localizedDescription)
-//}
-//throw error
