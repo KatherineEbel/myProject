@@ -8,7 +8,11 @@
     </section>
     <section>
       #if(isLoggedIn):
-        <b>#(email)</b> is logged in <a class="btn btn-link" href="/logout">Logout</a>
+        <p><b>#(email)</b> is logged in</p>
+        <div class="btn-group">
+          <a href="/admin/" class="btn btn-link">Admin</a> &middot;
+          <a class="btn btn-link" href="/logout">Logout</a>
+        </div>
       #else:
       <a href="/sign-in" class="btn btn-link">Sign-In</a>
       #endif

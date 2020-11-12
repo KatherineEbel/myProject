@@ -35,12 +35,14 @@ public func configure(_ app: Application) throws {
   let modules: [Module] = [
     UserModule(),
     FrontendModule(),
+    AdminModule(),
     BlogModule(),
   ]
 
   do {
     try modules.forEach { try $0.configure(app) }
     try app.autoMigrate().wait()
+      print(app.routes.all)
   } catch {
     fatalError("Error configuring app modules")
   }

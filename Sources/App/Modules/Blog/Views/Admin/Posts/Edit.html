@@ -1,0 +1,66 @@
+#extend("Admin/Index"):
+    #export("body"):
+        <div>
+            <h2><a class="btn btn-link" href="/admin/blog/posts">Posts</a> / #(editMode)</h2>
+            #if(edit.id != nil):
+            <a href="/#(edit.slug.value)" target="_blank">Preview</a>
+            #endif
+        </div>
+        #if(errors):
+            <div class="alert alert-danger align-middle text-center">
+                <p>Errors: #(errors)</p>
+            </div>
+        #else:
+            <div class="alert alert-info text-dark">
+                <p>No errors!!</p>
+            </div>
+        #endif
+        <form method="post" action="/admin/blog/posts/new/">
+            #if(edit.id):
+                <input type="hidden" name="id" value="#(edit.id)" id="id" />
+            #endif
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" value="#(edit.title)"
+                       id="title" name="title" />
+                #if(edit.title.error != nil):
+                <span class="error">#(edit.title.error)</span>
+                #endif
+            </div>
+            <div class="mb-3">
+                <label for="slug" class="form-label">Slug</label>
+                <input type="text" class="form-control" value="#(edit.slug)"
+                       id="slug" name="slug" />
+                #if(edit.slug.error != nil):
+                <span class="error">#(edit.slug.error)</span>
+                #endif
+            </div>
+            <div class="mb-3">
+                <label for="excerpt" class="form-label">Excerpt</label>
+                <input type="text" class="form-control" value="#(edit.excerpt)"
+                       id="excerpt" name="excerpt" />
+                #if(edit.excerpt.error != nil):
+                <span class="error">#(edit.excerpt.error)</span>
+                #endif
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea class="form-control" id="content"
+                          name="content">#(edit.content)</textarea>
+                #if(edit.content.error != nil):
+                <span class="error">#(edit.content.error)</span>
+                #endif
+            </div>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" value="#(edit.date)"
+                       name="date" aria-describedby="dateHelp">
+                <div id="dateHelp" class="form-text"> <span class="required">(Y.MM.dd. HH:mm:ss)</span></div>
+                #if(edit.date.error != nil):
+                <span class="error">#(edit.date.error)</span>
+                #endif
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+#endexport
+#endextend
