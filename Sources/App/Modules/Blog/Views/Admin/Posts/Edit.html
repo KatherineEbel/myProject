@@ -1,61 +1,52 @@
 #extend("Admin/Index"):
     #export("body"):
         <div>
-            <h2><a class="btn btn-link" href="/admin/blog/posts">Posts</a> / #(editMode)</h2>
-            #if(edit.id != nil):
-            <a href="/#(edit.slug.value)" target="_blank">Preview</a>
+            <h2><a class="btn btn-link" href="/admin/blog/posts">Posts</a></h2>
+            #if(form.id != nil):
+            <a href="/#(form.slug.value)" target="_blank">Preview</a>
             #endif
         </div>
-        #if(errors):
-            <div class="alert alert-danger align-middle text-center">
-                <p>Errors: #(errors)</p>
-            </div>
-        #else:
-            <div class="alert alert-info text-dark">
-                <p>No errors!!</p>
-            </div>
-        #endif
         <form method="post" action="/admin/blog/posts/new/">
-            #if(edit.id):
-                <input type="hidden" name="id" value="#(edit.id)" id="id" />
+            #if(form.id):
+                <input type="hidden" name="id" value="#(form.id)" id="id" />
             #endif
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
-                <input type="text" class="form-control" value="#(edit.title)"
+                <input type="text" class="form-control" value="#(form.title.value)"
                        id="title" name="title" />
-                #if(edit.title.error != nil):
-                <span class="error">#(edit.title.error)</span>
+                #if(form.title.error != nil):
+                <span class="alert alert-danger">#(form.title.error)</span>
                 #endif
             </div>
             <div class="mb-3">
                 <label for="slug" class="form-label">Slug</label>
-                <input type="text" class="form-control" value="#(edit.slug)"
+                <input type="text" class="form-control" value="#(form.slug.value)"
                        id="slug" name="slug" />
-                #if(edit.slug.error != nil):
-                <span class="error">#(edit.slug.error)</span>
+                #if(form.slug.error != nil):
+                <span class="alert alert-danger">#(form.slug.error)</span>
                 #endif
             </div>
             <div class="mb-3">
                 <label for="excerpt" class="form-label">Excerpt</label>
-                <input type="text" class="form-control" value="#(edit.excerpt)"
+                <input type="text" class="form-control" value="#(form.excerpt.value)"
                        id="excerpt" name="excerpt" />
-                #if(edit.excerpt.error != nil):
-                <span class="error">#(edit.excerpt.error)</span>
+                #if(form.excerpt.error != nil):
+                <span class="alert alert-danger">#(form.excerpt.error)</span>
                 #endif
             </div>
             <div class="mb-3">
                 <label for="content" class="form-label">Content</label>
                 <textarea class="form-control" id="content"
-                          name="content">#(edit.content)</textarea>
-                #if(edit.content.error != nil):
-                <span class="error">#(edit.content.error)</span>
+                          name="content">#(form.content.value)</textarea>
+                #if(form.content.error != nil):
+                <span class="alert alert-danger">#(form.content.error)</span>
                 #endif
             </div>
             <div class="mb-3">
                 <label for="categoryId" class="form-label">Category</label>
                 <select name="categoryId" id="categoryId" class="form-control">
-                    #for(option in categories):
-                        <option #if(option.key == edit.categoryId): selected="selected" #endif
+                    #for(option in form.category.options):
+                        <option #if(option.key == form.categoryId): selected="selected" #endif
                                 value="#(option.key)">
                             #(option.label)
                         </option>
@@ -64,11 +55,11 @@
             </div>
             <div class="mb-3">
                 <label for="date" class="form-label">Date</label>
-                <input type="date" class="form-control" id="date" value="#(edit.date)"
+                <input type="date" class="form-control" id="date" value="#(form.date.value)"
                        name="date" aria-describedby="dateHelp">
-                <div id="dateHelp" class="form-text"> <span class="required">(Y.MM.dd. HH:mm:ss)</span></div>
-                #if(edit.date.error != nil):
-                <span class="error">#(edit.date.error)</span>
+<!--                <div id="dateHelp" class="form-text"> <span class="required">(Y.MM.dd. HH:mm:ss)</span></div>-->
+                #if(form.date.error != nil):
+                <span class="alert alert-danger">#(form.date.error)</span>
                 #endif
             </div>
             <button type="submit" class="btn btn-primary">Save</button>

@@ -5,6 +5,11 @@
 import Vapor
 import Fluent
 
+enum BlogPostError: Error {
+  case writeError(reason: String)
+  case readError(reason: String)
+  case invalidDateFormat
+}
 final class BlogPostModel: Model {
   static let schema: String = "blog_posts"
 

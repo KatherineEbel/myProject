@@ -15,41 +15,59 @@ struct BlogPostAdminController {
   }
 
   func createView(_ req: Request) throws -> EventLoopFuture<View> {
-    req.session.data["postError"] = nil
-    return try BlogPostEditForm.fromRequest(req)
-      .flatMapErrorThrowing { error in
-        req.session.data["postError"] = error.localizedDescription
-        return BlogPostEditForm()
-      }
+    if let _ = req.parameters.get("id") {
+      return try updateView(req)
+    }
+    return beforeRenderCreate(req: req, form: BlogPostForm())
       .flatMap { form in
-        let error = req.session.data["postError"]
-        return BlogCategoryModel.query(on: req.db)
-          .all()
-          .flatMap { categories in
-            let options = categories.map { category in FormFieldStringOption.fromModel(category)}
-            return req.view.render("Blog/Admin/Posts/Edit", CreateViewContext(title: "Blog Admin", edit: form, editMode: "Create", errors: error, categories: options))
-        }
+        req.view.render("Blog/Admin/Posts/Edit",["form": form])
       }
   }
 
   func createPost(_ req: Request) throws -> EventLoopFuture<Response> {
-    try req.auth.require(UserModel.self)
+    var form: BlogPostForm
     do {
-      try BlogPostEditForm.validate(content: req)
-    } catch {
-      if let error = error as? ValidationsError {
-        req.session.data["postError"] = error.description
-        return req.eventLoop.future(req.redirect(to: "/admin/blog/posts"))
+      form = BlogPostForm(request: req)
+      try BlogPostForm.Inputs.validate(content: req)
+      let model = try form.write(to: BlogPostModel())
+      if model.id != nil {
+        return model.update(on: req.db).map {
+          req.redirect(to: "/admin/blog/posts")
+        }
       }
-      print(error.localizedDescription)
-    }
-    return try BlogPostModel.edit(from: req).map { post in
-      if post != nil {
-        return req.redirect(to: "/admin/blog/posts")
-      } else {
-        return req.redirect(to: "/admin/blog/posts/new")
+      return model.save(on: req.db).map {
+        req.redirect(to: "/admin/blog/posts")
       }
+    } catch let error as ValidationsError {
+      print(error.description)
+      let formWithError = form.withError(validationsError: error)
+      return beforeRenderCreate(req: req, form: formWithError).flatMap { options in
+        req.view
+          .render("Blog/Admin/Posts/Edit", ["form": formWithError])
+          .encodeResponse(for: req)
+      }
+    } catch let error as BlogPostError {
+      switch error {
+      case .writeError(let reason): print(reason)
+      case .invalidDateFormat: print("Invalid date format")
+      case .readError: print("Not handled yet")
+      }
+      return beforeRenderCreate(req: req, form: form)
+        .flatMap {
+          req.view.render("Blog/Admin/Posts/Edit", ["form": $0]).encodeResponse(for: req)
+        }
     }
+  }
+
+  func updateView(_ req: Request) throws -> EventLoopFuture<View> {
+    BlogPostModel.find(req.parameters.get("id"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { model in
+        let form = BlogPostForm(for: model)
+        return beforeRenderCreate(req: req, form: form)
+          .flatMap { req.view.render("Blog/Admin/Posts/Edit", ["form": $0]) }
+      }
+
   }
 
   func delete(_ req: Request) throws -> EventLoopFuture<Response> {
@@ -63,16 +81,17 @@ struct BlogPostAdminController {
         req.redirect(to: "/admin/blog/posts")
       }
   }
+
+  private func beforeRenderCreate(req: Request, form: BlogPostForm) -> EventLoopFuture<BlogPostForm> {
+    BlogCategoryModel.query(on: req.db)
+      .all()
+      .mapEach(\.formFieldStringOption)
+      .map { form.category.options = $0}
+      .map { form }
+  }
+
   struct ListViewContext: Encodable {
     let title: String
     let list: [BlogPostModel]
-  }
-
-  struct CreateViewContext: Content {
-    let title: String
-    let edit: BlogPostEditForm
-    let editMode: String
-    let errors: String?
-    let categories: [FormFieldStringOption]
   }
 }
