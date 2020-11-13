@@ -1,0 +1,25 @@
+#extend("Admin/Index"):
+    #export("body"):
+        <div class="container">
+            <h2>
+                <a href="/admin/blog/categories/">Categories</a> /
+                #if(form.id != nil):"Edit"#else:"Create"#endif
+            </h2>
+            <form method="post"
+                  action="/admin/blog/categories/#if(form.id):#(form.id)/#else:/new/#endif">
+                <input type="hidden" name="id" value="#(form.id)"/>
+                <div class="mb3">
+                    <label for="title">Title <small id="emailHelp" class="form-text text-muted">required</small></label>
+                    <input class="form-control" type="text" name="title" id="title" value="#(form.title.value)" />
+                    #if(form.title.error):
+                        <span class="alert alert-danger">Title has errors: #(edit.title.error)</span>
+                    #endif
+                </div>
+                <div class="actions">
+                    <input class="btn btn-success" type="submit" value="Save" />
+                </div>
+            </form>
+
+        </div>
+    #endexport
+#endextend

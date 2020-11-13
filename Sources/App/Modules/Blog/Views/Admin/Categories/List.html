@@ -1,0 +1,27 @@
+#extend("Admin/Index"):
+  #export("body"):
+    <div class="container">
+      <h2>Categories</h2>
+      <a href="/admin/blog/categories/new">Create</a>
+      <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+          <th>Title</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        #for(item in list):
+        <tr>
+          <td>#(item.title)</td>
+          <td>
+            <a href="/admin/blog/categories/#(item.id)">Edit</a>
+            <a id="#(item.id)" href="#">Delete</a>
+          </td>
+        </tr>
+        #endfor
+        </tbody>
+      </table>
+    </div>
+  #endexport
+#endextend
