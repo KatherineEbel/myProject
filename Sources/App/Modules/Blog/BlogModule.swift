@@ -7,6 +7,7 @@ import Vapor
 import Fluent
 
 struct BlogModule: Module {
+  private(set) static var name: String = "blog"
   var router: RouteCollection? { BlogRouter() }
   var migrations: [Migration] {
     [

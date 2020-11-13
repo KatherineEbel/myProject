@@ -6,5 +6,6 @@ import Foundation
 import Vapor
 
 struct FrontendModule: Module {
+  private(set) static var name: String = "frontend"
   var router: RouteCollection? { FrontendRouter() }
 }

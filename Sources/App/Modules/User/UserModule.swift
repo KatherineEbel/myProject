@@ -6,6 +6,7 @@ import Vapor
 import Fluent
 
 struct UserModule: Module {
+  private(set) static var name: String = "user"
   var router: RouteCollection? { UserRouter() }
 
   var migrations: [Migration] {
@@ -27,4 +28,5 @@ struct UserModule: Module {
       try router.boot(routes: app.routes)
     }
   }
+
 }

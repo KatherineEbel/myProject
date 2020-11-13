@@ -45,6 +45,7 @@ public func configure(_ app: Application) throws {
     FrontendModule(),
     AdminModule(),
     BlogModule(),
+    UtilityModule(),
   ]
 
   do {
