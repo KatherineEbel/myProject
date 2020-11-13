@@ -6,7 +6,7 @@
             <a href="/#(form.slug.value)" target="_blank">Preview</a>
             #endif
         </div>
-        <form method="post" action="/admin/blog/posts/new/">
+        <form enctype="multipart/form-data" method="post" action="/admin/blog/posts/#if(form.id):#(form.id)/#else:new/#endif">
             #if(form.id):
                 <input type="hidden" name="id" value="#(form.id)" id="id" />
             #endif
@@ -61,6 +61,24 @@
                 #if(form.date.error != nil):
                 <span class="alert alert-danger">#(form.date.error)</span>
                 #endif
+            </div>
+            <div class="mb-3">
+                <label for="image">Image</label>
+                <div class="d-flex flex-row align-items-center">
+                    #if(form.image.value != ""):
+                    <img class="img-fluid img-thumbnail preview" src="#(form.image.value)" alt="preview image"
+                    />
+                    #endif
+                    <div class="btn-group-sm ml-2 mr-2">
+                        <button class="btn btn-outline-info btn-sm" id="choose-button" type="button" onclick="chooseImage()">Choose</button>
+                        <button class="btn btn-outline-danger btn-sm" type="button" onclick="removeImage()">Remove</button>
+                    </div>
+                    <input type="hidden" name="imageDelete" value="false" id="imageDelete">
+                    <input type="file" name="image" id="image" accept="image/jpeg" style="display: none;" />
+                    #if(form.image.error != nil):
+                    <span class="alert alert-danger">#(form.image.error)</span>
+                    #endif
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Save</button>
         </form>

@@ -1,3 +1,7 @@
 tr img {
     width: 64px;
 }
+
+img.preview {
+  width: 160px;
+}

@@ -3,7 +3,7 @@
 //
 
 import Vapor
-import Leaf
+import LeafKit
 
 protocol FileIOLeafSource: LeafSource {
   var fileIO: NonBlockingFileIO { get }

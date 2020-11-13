@@ -17,6 +17,8 @@ final class BlogPostForm: Content {
     var date = ""
     var content = ""
     var categoryId = ""
+    var image: File?
+    var imageDelete: Bool?
   }
 
   var id: UUID? = nil
@@ -26,6 +28,7 @@ final class BlogPostForm: Content {
   var date = FormField<String>(value: "")
   var content = FormField<String>(value: "")
   var category = StringSelectionFormField()
+  var image = FileFormField()
 
   static var dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -37,13 +40,14 @@ final class BlogPostForm: Content {
 
   convenience init(for model: BlogPostModel) {
     self.init()
-    self.id = model.id
-    self.title.value = model.title
-    self.slug.value = model.slug
-    self.excerpt.value = model.excerpt
-    self.content.value = model.content
-    self.date.value = BlogPostForm.dateFormatter.string(from: model.date)
-    self.category.value = model.$category.id.uuidString
+    id = model.id
+    title.value = model.title
+    slug.value = model.slug
+    excerpt.value = model.excerpt
+    content.value = model.content
+    date.value = BlogPostForm.dateFormatter.string(from: model.date)
+    category.value = model.$category.id.uuidString
+    image.value = model.image
   }
 
   convenience init(request: Request) {
@@ -59,12 +63,19 @@ final class BlogPostForm: Content {
     if let id = inputs.id {
       self.id = UUID(uuidString: id)
     }
-    self.title.value = inputs.title
-    self.slug.value = inputs.slug
-    self.excerpt.value = inputs.excerpt
-    self.date.value = inputs.date
-    self.content.value = inputs.content
-    self.category.value = inputs.categoryId
+    title.value = inputs.title
+    slug.value = inputs.slug
+    excerpt.value = inputs.excerpt
+    date.value = inputs.date
+    content.value = inputs.content
+    category.value = inputs.categoryId
+    image.delete = inputs.imageDelete ?? false
+    if
+      let img = inputs.image,
+      let data = img.data.getData(at: 0, length: img.data.readableBytes),
+      !data.isEmpty {
+      image.data = data
+    }
   }
 
   func write(to model: BlogPostModel) throws -> BlogPostModel {
@@ -79,13 +90,19 @@ final class BlogPostForm: Content {
         throw BlogPostError.writeError(reason: "mismatching id's")
       }
     }
+    model.id = id
     model.title = title.value
     model.slug = slug.value
     model.excerpt = excerpt.value
     model.date = formattedDate
     model.content = content.value
-    model.image = "/images/posts/01.jpg"
     model.$category.id = categoryId
+    if !image.value.isEmpty {
+      model.image = image.value
+    }
+    if image.delete {
+      model.image = ""
+    }
     return model
   }
 

@@ -2,7 +2,7 @@
 // Created by Katherine Ebel on 11/10/20.
 //
 
-import Leaf
+import LeafKit
 
 extension BlogCategoryModel: LeafDataRepresentable {
   var leafData: LeafData {

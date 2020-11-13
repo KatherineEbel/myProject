@@ -1,12 +1,20 @@
 import Vapor
-import Leaf
+import LeafKit
 import Fluent
 import FluentPostgresDriver
+import Liquid
+import LiquidLocalDriver
 
 // configures your application
 public func configure(_ app: Application) throws {
   app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
   app.middleware.use(ExtendPathMiddleware())
+  
+  app.routes.defaultMaxBodySize = "10mb"
+  
+  app.fileStorages.use(.local(publicUrl: "http://localhost:8080", publicPath: app.directory.publicDirectory, workDirectory: "assets"), as: .local)
+  
+  
   app.databases.use(.postgres(
     hostname: Environment.get("DATABASE_HOST") ?? "localhost",
     port: 5432,

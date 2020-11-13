@@ -13,6 +13,8 @@ let package = Package(
       .package(url: "https://github.com/vapor/fluent", from: "4.0.0"),
       .package(url: "https://github.com/vapor/fluent-postgres-driver", from: "2.1.1"),
       .package(url: "https://github.com/lukaskubanek/LoremSwiftum", from: "2.2.1"),
+      .package(url: "https://github.com/binarybirds/liquid", from: "1.1.0"),
+      .package(url: "https://github.com/binarybirds/liquid-local-driver", from : "1.1.0"),
     ],
     targets: [
         .target(
@@ -23,6 +25,8 @@ let package = Package(
               .product(name: "Fluent", package: "fluent"),
               .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
               .product(name: "LoremSwiftum", package: "LoremSwiftum"),
+              .product(name: "Liquid", package: "liquid"),
+              .product(name: "LiquidLocalDriver", package: "liquid-local-driver"),
             ],
           exclude: [
             //"*.html", "*.leaf",

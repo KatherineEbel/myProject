@@ -5,6 +5,7 @@
 import Vapor
 import Fluent
 import Leaf
+import Liquid
 
 struct BlogPostAdminController {
   func listView(_ req: Request) throws -> EventLoopFuture<View> {
@@ -24,20 +25,25 @@ struct BlogPostAdminController {
       }
   }
 
-  func createPost(_ req: Request) throws -> EventLoopFuture<Response> {
+  func create(_ req: Request) throws -> EventLoopFuture<Response> {
     var form: BlogPostForm
     do {
       form = BlogPostForm(request: req)
       try BlogPostForm.Inputs.validate(content: req)
+      if form.id != nil {
+        return BlogPostModel.find(form.id, on: req.db)
+          .unwrap(or: Abort(.notFound))
+          .flatMapThrowing { try form.write(to: $0) }
+          .flatMap { model in
+            beforeUpdate(req: req, model: model, form: form)
+              .flatMap { $0.update(on: req.db) }
+          }
+          .map { req.redirect(to: "/admin/blog/posts")}
+      }
       let model = try form.write(to: BlogPostModel())
-      if model.id != nil {
-        return model.update(on: req.db).map {
-          req.redirect(to: "/admin/blog/posts")
-        }
-      }
-      return model.save(on: req.db).map {
-        req.redirect(to: "/admin/blog/posts")
-      }
+      return beforeCreate(req: req, model: model, form: form)
+        .flatMap { $0.save(on: req.db) }
+        .map { req.redirect(to: "/admin/blog/posts/") }
     } catch let error as ValidationsError {
       print(error.description)
       let formWithError = form.withError(validationsError: error)
@@ -71,12 +77,10 @@ struct BlogPostAdminController {
   }
 
   func delete(_ req: Request) throws -> EventLoopFuture<Response> {
-    try req.auth.require(UserModel.self)
     return BlogPostModel.find(req.parameters.get("id"), on: req.db)
       .unwrap(or: Abort(.notFound))
-      .flatMap {
-        $0.delete(on: req.db)
-      }
+      .flatMap { model in beforeDelete(req: req, model: model) }
+      .flatMap { $0.delete(on: req.db) }
       .map {
         req.redirect(to: "/admin/blog/posts")
       }
@@ -90,6 +94,51 @@ struct BlogPostAdminController {
       .map { form }
   }
 
+  private func beforeCreate(req: Request, model: BlogPostModel, form: BlogPostForm) -> EventLoopFuture<BlogPostModel> {
+    var future: EventLoopFuture<BlogPostModel> = req.eventLoop.future(model)
+    if let data = form.image.data {
+      let key = "/blog/posts/" + UUID().uuidString + ".jpg"
+      future = req.fs.upload(key: key, data: data).map { url in
+        form.image.value = url
+        model.imageKey = key
+        model.image = url
+        return model
+      }
+    }
+    return future
+  }
+  
+  private func beforeUpdate(req: Request, model: BlogPostModel, form: BlogPostForm) -> EventLoopFuture<BlogPostModel> {
+    var future: EventLoopFuture<BlogPostModel> = req.eventLoop.future(model)
+    if (form.image.delete || form.image.data != nil), let imageKey = model.imageKey {
+      future = req.fs.delete(key: imageKey).map {
+        form.image.value = ""
+        model.image = ""
+        model.imageKey = nil
+        return model
+      }
+    }
+    if let data = form.image.data {
+      return future.flatMap { model in
+        let key = "/blog/posts/" + UUID().uuidString + ".jpg"
+        return req.fs.upload(key: key, data: data).map { url in
+          form.image.value = url
+          model.imageKey = key
+          model.image = url
+          return model
+        }
+      }
+    }
+    return future
+  }
+
+  private func beforeDelete(req: Request, model: BlogPostModel) -> EventLoopFuture<BlogPostModel> {
+    if let key = model.imageKey {
+      return req.fs.delete(key: key).map { model }
+    }
+    return req.eventLoop.future(model)
+  }
+  
   struct ListViewContext: Encodable {
     let title: String
     let list: [BlogPostModel]

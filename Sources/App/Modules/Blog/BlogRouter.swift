@@ -22,11 +22,11 @@ struct BlogRouter: RouteCollection {
 
     posts.get(use: adminController.listView)
     posts.get("new", use: adminController.createView)
-    posts.post("new", use: adminController.createPost)
+    posts.post("new", use: adminController.create)
 
     let edit = posts.grouped(":id")
     edit.get(use: adminController.createView)
-    edit.post(use: adminController.createPost)
+    edit.post(use: adminController.create)
     edit.post("delete", use: adminController.delete)
   }
 }

@@ -12,6 +12,7 @@ struct BlogModule: Module {
     [
       BlogMigration_v1_0_0(),
       BlogMigrationSeed(),
+      BlogMigration_v1_1_0(),
     ]
   }
 }

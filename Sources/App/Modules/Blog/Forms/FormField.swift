@@ -10,7 +10,7 @@ struct FormField<Type: Content>: Content, FormFieldRepresentable {
   var value: Type
   var error: String? = nil
 
-  init(value: Type) {
+  init(value: Value) {
     self.value = value
   }
 }
