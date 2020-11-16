@@ -1,0 +1,24 @@
+DELETE http://localhost:8080/api/blog/categories/AE75B9B8-14A5-4C24-A5CF-EAD7984241B0
+
+###
+
+PUT http://localhost:8080/api/blog/categories/73533D6F-D27D-43E7-98E9-8F4B5F7ABBE6
+Content-Type: application/json
+
+{"title": "Tech"}
+
+###
+POST http://localhost:8080/api/blog/categories/
+Content-Type: application/json
+
+{"title":  ""}
+
+###
+GET http://localhost:8080/api/blog/categories/73533D6F-D27D-43E7-98E9-8F4B5F7ABBE6
+Accept: application/json
+
+###
+GET http://localhost:8080/api/blog/categories
+Accept: application/json
+
+###

@@ -31,5 +31,17 @@ struct BlogRouter: RouteCollection {
     postsEdit.post("delete", use: adminController.delete)
 
     categoryAdminController.setupRoutes(on: blog, as: "categories")
+
+    let blogAPI = routes.grouped("api", "blog")
+    let categories = blogAPI.grouped("categories")
+    let categoryApiController = BlogCategoryApiController()
+    categoryApiController.setupListRoute(routes: categories)
+    categoryApiController.setupGetRoute(routes: categories)
+    categoryApiController.setupCreateRoute(routes: categories)
+    categoryApiController.setupUpdateRoute(routes: categories)
+    categoryApiController.setupDeleteRoute(routes: categories)
+
+    let postsApiController = BlogPostAPIController()
+    postsApiController.setupRoutes(routes: blogAPI, on: "posts")
   }
 }

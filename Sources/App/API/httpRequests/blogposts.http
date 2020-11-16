@@ -1,0 +1,4 @@
+GET http://localhost:8080/api/blog/posts
+Accept: application/json
+
+###
