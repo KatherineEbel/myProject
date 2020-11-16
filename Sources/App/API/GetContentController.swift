@@ -11,8 +11,9 @@ protocol GetContentController: IdentifiableContentController where Model: GetCon
 }
 
 extension GetContentController {
-  func get(_ req: Request) throws -> EventLoopFuture<Model.GetContent> {
-    try find(req).map(\.getContent)
+  func get(_ request: Request) throws -> EventLoopFuture<Model.GetContent> {
+    print("Default")
+    return try find(request).map(\.getContent)
   }
 
   func setupGetRoute(routes: RoutesBuilder) {

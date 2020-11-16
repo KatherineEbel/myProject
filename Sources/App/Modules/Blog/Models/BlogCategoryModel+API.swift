@@ -22,6 +22,7 @@ extension BlogCategoryModel: GetContentRepresentable {
   struct GetContent: Content {
     var id: String
     var title: String
+    var posts: [BlogPostModel.ListItem]?
 
     init(model: BlogCategoryModel) {
       id = model.id!.uuidString

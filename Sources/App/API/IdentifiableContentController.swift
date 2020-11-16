@@ -17,6 +17,7 @@ extension IdentifiableContentController {
 
 extension IdentifiableContentController where Model.IDValue == UUID {
   func find(_ req: Request) throws -> EventLoopFuture<Model> {
+    print("FIND")
     guard
       let rawValue = req.parameters.get(idParamKey),
       let id = UUID(uuidString: rawValue) else {
