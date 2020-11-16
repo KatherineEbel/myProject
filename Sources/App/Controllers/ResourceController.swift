@@ -40,7 +40,7 @@ protocol ResourceController {
   
   func beforeUpdateResource(req: Request, model: Model, form: EditForm) -> EventLoopFuture<Model>
   
-  func updateResource(req: Request) throws -> EventLoopFuture<View>
+  func updateResource(req: Request) throws -> EventLoopFuture<Response>
   
   func beforeDeleteResource(req: Request, model: Model) -> EventLoopFuture<Model>
 
@@ -114,7 +114,7 @@ extension ResourceController where Model.IDValue == UUID {
     req.eventLoop.future(model)
   }
 
-  func updateResource(req: Request) throws -> EventLoopFuture<View> {
+  func updateResource(req: Request) throws -> EventLoopFuture<Response> {
     let form = try EditForm(req: req)
     do {
       try EditForm.Input.validate(content: req)
@@ -125,7 +125,7 @@ extension ResourceController where Model.IDValue == UUID {
           return model.update(on: req.db)
             .map { form.read(from: model as! EditForm.Model) }
         }
-        .flatMap { render(req: req, form: form) }
+        .flatMap { req.eventLoop.future(req.redirect(to: redirectURL)) }
     } catch  {
       return req.eventLoop.future(error: error)
     }
@@ -142,5 +142,18 @@ extension ResourceController where Model.IDValue == UUID {
         model.delete(on: req.db)
           .map { model.id!.uuidString }
       }
+  }
+
+  func setupRoutes(on builder: RoutesBuilder, as pathComponent: PathComponent, create createPathComponent: PathComponent = "new",
+                   delete deletePathComponent: PathComponent = "delete") {
+    let base = builder.grouped(pathComponent)
+    base.get(use: resourceListView)
+    base.get(createPathComponent, use: createResourceView)
+    base.post(createPathComponent, use: createResource)
+
+    let edit = base.grouped(idPathComponent)
+    edit.get(use: updateResourceView)
+    edit.post(use: updateResource)
+    edit.post(deletePathComponent, use: deleteResource)
   }
 }

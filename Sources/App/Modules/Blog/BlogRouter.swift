@@ -29,17 +29,7 @@ struct BlogRouter: RouteCollection {
     postsEdit.get(use: adminController.createView)
     postsEdit.post(use: adminController.create)
     postsEdit.post("delete", use: adminController.delete)
-    
-    let categories = blog.grouped("categories")
-    categories.get(use: categoryAdminController.resourceListView)
-    
-    let create = categories.grouped("new")
-    create.get(use: categoryAdminController.createResourceView)
-    create.post(use: categoryAdminController.createResource)
-    
-    let categoriesEdit = categories.grouped(":id")
-    categoriesEdit.get(use: categoryAdminController.updateResourceView)
-    categoriesEdit.post(use: categoryAdminController.updateResource)
-    categoriesEdit.post("delete", use: categoryAdminController.deleteResource)
+
+    categoryAdminController.setupRoutes(on: blog, as: "categories")
   }
 }

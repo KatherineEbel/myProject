@@ -28,20 +28,31 @@ function removeImage() {
     }
 }
 
-document.getElementById('image').onchange = event => {
-    const file = event.target.files[0]
-    const blobURL = URL.createObjectURL(file)
-    let el = document.querySelector('.preview')
-    if (el === null) {
+let imageEl = document.getElementById('image')
+if (imageEl != null) {
+
+    imageEl.onchange = event => {
+        const file = event.target.files[0]
+        const blobURL = URL.createObjectURL(file)
+        let el = document.querySelector('.preview')
+        if (el === null) {
 //      <img class="img-fluid img-thumbnail preview" src="#(form.image.value)" alt="preview image"
 //           style="height: 80px; width: 160px;"
 //      />
-        let newEl = document.createElement('img')
-        newEl.className = "img-fluid img-thumbnail preview"
-        newEl.alt = "preview image"
-        const sibling = document.getElementById('choose-button')
-        sibling.parentNode.insertBefore(newEl, sibling)
-        el = newEl
+            let newEl = document.createElement('img')
+            newEl.className = "img-fluid img-thumbnail preview"
+            newEl.alt = "preview image"
+            const sibling = document.getElementById('choose-button')
+            sibling.parentNode.insertBefore(newEl, sibling)
+            el = newEl
+        }
+        el.src = blobURL
     }
-    el.src = blobURL
 }
+
+document.addEventListener('keydown', e => {
+    if ((window.navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) && e.key === 's' ) {
+        e.preventDefault()
+        document.forms[0].submit()
+    }
+})
