@@ -6,13 +6,15 @@ import Foundation
 import Vapor
 import Fluent
 
-final class BlogCategoryForm: Content {
+final class BlogCategoryForm: Form {
+  typealias Model = BlogCategoryModel
+
   struct Input: Content {
     var id: String
     var title: String
   }
 
-  var id: String? = nil
+  var id: UUID? = nil
   var title = FormField<String>(value: "")
 
   init() {}
@@ -20,14 +22,14 @@ final class BlogCategoryForm: Content {
   init(req: Request) throws {
     let context = try req.content.decode(Input.self)
     if !context.id.isEmpty {
-      id = context.id
+      id = UUID(uuidString: context.id)
     }
     title.value = context.title
   }
 
   func read(from model: BlogCategoryModel) {
     if let id = model.id {
-      self.id = id.uuidString
+      self.id = id
     }
     self.title.value = model.title
   }
