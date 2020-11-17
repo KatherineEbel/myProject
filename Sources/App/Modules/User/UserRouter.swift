@@ -6,6 +6,7 @@ import Vapor
 
 struct UserRouter: RouteCollection {
   let controller = UserFrontendController()
+  let apiController = UserApiController()
 
   func boot(routes: RoutesBuilder) throws {
     routes.get("sign-in", use: controller.loginView)
@@ -13,5 +14,9 @@ struct UserRouter: RouteCollection {
     signInRoutes.post("sign-in", use: controller.login)
     routes.grouped(UserModel.sessionAuthenticator())
       .get("logout", use: controller.logout)
+
+    let api = routes.grouped("api", "user")
+    api.grouped(UserModelCredentialsAuthenticator())
+      .post("login", use: apiController.login)
   }
 }

@@ -14,8 +14,7 @@ struct BlogCategoryApiController: ListContentController,
   typealias Model = BlogCategoryModel
 
   func get(_ req: Request) throws -> EventLoopFuture<Model.GetContent> {
-    print("BlogCategoryApiController") // TODO: Figure out why this method isn't being called
-    return try self.find(req).flatMap { category in
+    try self.find(req).flatMap { category in
       BlogPostModel.query(on: req.db)
         .filter(\.$category.$id == category.id!)
         .all()

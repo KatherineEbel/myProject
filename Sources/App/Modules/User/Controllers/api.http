@@ -1,0 +1,27 @@
+POST http://localhost:8080/api/user/login/
+Content-Type: application/json
+
+{
+  "email": "admin@localhost.com",
+  "password":  "asuperhardpassword1"
+}
+
+###
+
+// Create Category as guest unauthorized
+POST http://localhost:8080/api/blog/categories/
+
+{
+  "title": "testing"
+}
+
+###
+
+// Authenticated request
+POST http://localhost:8080/api/blog/categories/
+Content-Type: application/json
+Authorization: Bearer wsLkg3RmNTG8HZpVq96y3Q==
+
+{
+  "title": "testing"
+}
